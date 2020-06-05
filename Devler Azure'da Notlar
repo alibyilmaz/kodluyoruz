@@ -1,0 +1,196 @@
+# Azure DevOps ile Uygulama Derleme ve Dağıtma
+
+Mehmet Kut
+
+### DevOps nedir?
+
+&quot;Devops is the union of the people, process ve products to enable continuous delivery of value to business and it end-users.../ insan, süreç ve ürünlerin sürekli şekilde son kullanıcıya bir değer üretmesine Devops denir&quot; Donovan Brown, Microsoft
+
+The cycle of build-develop-deploy
+
+### Introducing Azure DevOps
+
+![s1](http://image.prntscr.com/image/fwlgJPt1RE_78AAhHbKOZw.png)
+#### Azure DevOps Tool kitleri
+
+Azure Boards – agile tools to plan,track and discuss
+
+Azure Pipelines – build, test and deploy with CI/CD that works with any lang. Platform and cloud. Connect to github or etc.
+
+Azure Repos – cloud - hosted private git repos and collobrate to build better code with pull requests
+
+Azure Test Plans – test and ship
+
+Azure Artifacts – create, host, and share packages w/ your team, add artifacts to your CI/CD pipelines w/ a single click
+
+### Benefits
+
+Quick set/up
+
+Maintenance-free operations
+
+Easy collobration across domains
+
+Elastic scale
+
+Rock-solid security
+
+Access to cloud-running
+
+### Azure Pipeline
+
+Host any lang, platform, any cloud
+
+The deployment not for only azure cloud, enable for in addition to azure, AWS,GCP and on-prem
+
+Building a pipeline for .net core app
+
+1.New build pipeline
+
+2. Select source control env.
+
+3. Select repo
+
+4. Azure pipelines analyzes the src code and prvd &quot;options&quot; for build
+
+5. This results in a &quot;Azure-pipelines.yml&quot; file
+
+6. Create and Run your Build
+
+### Demo
+
+Yukarıdaki adımlar izlenerek Azure pipeline&#39;da pipeline create ediliyor. Ardından VS üzerinde basic bir ASP.Net Core uygulaması açıldı Git&#39;e dahil edilerek Azure&#39;da publish seçeneğine tıklanıyor, ardında repo seçilerek repo publish ediliyor. Bu şekilde oluşturulan repo Azure Pipeline üzerine geçiriliyor.
+
+Azure pipeline ASP .Net Core olarak configure ediliyor ve commit ediliyor. Ardından build aşamalarından geçiyor ve pipeline oluşması sonucu bir artifact dosyası yaratılıyor.
+
+### Deploy süreci
+
+Azure Pipeline Release özelliği ile deployment yapılabiliyor. Bu aşamada release özelliği tıklanarak stage aşamaları hangisi tercih ediliyorsa oluşturuluyor(prod,staging,test etc.), deploy edilecek stage Azure Web App seçilerek Linux ortamda .Net Core runtime&#39;a sahip bir stage&#39;de release edilebiliyor.
+
+Bu aşamada Create new Pipeline denerek, Azure Web App seçiliyor, az önce repo edilen demo artifact ve production içerisinde Azure subscribation seçilerek, App Type Web App on Linux seçiliyor. Save edilerek Pipeline tasarlanmış oluyor.
+
+Save ettikten sonra ise Create Release butonu oluşuyor. Bu buton tıklandıktan sonra mevcut artifact seçiliyor ve release oluşuyor ve auto deployment seçiliyken production pipeline üzerinde deployment başlatılıyor ve portal.azure.com&#39;da deployment başarılı bir şekilde sonlanarak demo canlıya çıkıyor.
+
+Örneğin 3 servisi olan(staging,test, prod) bir uygulamada 100 deployment yapılmak istendiğinde monolitik yöntemle 300 deployment yapılması gerekir. Ancak Azure Pipeline ve release ile çok daha sürdürülebilir bir CI/CD süreci mümkün hale geliyor.
+
+Open Source projeler için Azure Pipeline&#39;da sınırsız build minutes mevcut. Bunun dışında 1 agent değil 10 ücretsiz paralel Windows, Linux ve macOS veriliyor.
+
+## Agents
+
+### Microsoft-Hosted Agents
+
+Microsoft&#39;un daha önce kullanım için hazırladığı sanal linkinler olarak tanımlamak mümkün. Bunlara erişiminiz olmuyor ancak uygulamanız örneğin Ubuntu veya VS gerektiriyorsa bunu seçebiliyorsunuz.
+
+[https://docs.microsoft.com/en-us/azure/devops/pipelines/agents/hosted?view=azure-devops&amp;tabs=yaml](https://docs.microsoft.com/en-us/azure/devops/pipelines/agents/hosted?view=azure-devops&amp;tabs=yaml)
+
+Bu link üzerinden hangi ortamlar ve arkaplanda derleme yapılması için hangi toolların kullanıldığı ile ilgili detaylar mevcut. Chocolatey ile mevcutta bulunmayan toollar da kurulabilir. Ancak bu kurulum örn. 2dk sürmekteyse pipeline her açıldığında o süre kadar bekler. Build çıktısı olarak max. 10 GB bir çıktı limiti mevcut. Build agentlar en fazla 6 saat çalışabiliyor ve Windows administrator ve şifresiz Linux sudo userı kullanıcısı supervisor olarak çalışıyor. Windows makinaya RDP veya başka bir yöntemle login olunamıyor.
+
+### Self-Hosted Agents
+
+Bu agent formatında siz kendi makinalarınızı build veya release agenta çeviriyorsunuz, bu sayede esnek olarak derlemeyi kendi ortamlarınızda yapabiliyorsunuz. Olmayan toolları her defasında yeniden kurmak durumunda kalmıyorsunuz.
+
+![s2](http://image.prntscr.com/image/q8bpJU5fTjeg9daiM67rHA.png)
+
+### Microsoft-Hosted Agents vs. Self-Hosted Agents
+
+Microsoft Hosted-Agents bakım gerektirmiyor buna karşın Self-Hosted Agents bakım gerektiriyor. MS host-agents ayda 1 otomatik olarak güncelleniyor.
+
+MS host agents firewall arkasında çalışmıyor(çalışabiliecek şekilde kurgulanabilir) ancak Self hosted agents çalışabiliyor.
+
+MS host agents self hosted agentsa göre derleme ve artifact çıkma hızında cachinglerinden dolayı daha yavaş kalabiliyor.
+
+MS host agentta çıktığınız releasein süresi yoğunluğa bağlı artabiliyor, selfte size ait olduğunda eğer çalışıyorsa direk başlıyor.
+
+### Demo 2
+
+http://image.prntscr.com/image/7mR2TyfmRV_zPb3dfiKV4A.png
+
+Azure repos&#39;a bir ASP.NET uygulaması gönderilerek, bu repoyu MS-Hosted Agentta derleyip, çıktı artifact bir ISS makinası Self-Hosted olarak kurgulanarak uygulama ISS üzerine deploy ediliyor.
+
+MVC bir ASP .Net uygulaması oluşturuldu. Bunun pipeline&#39;ı hazırlandı. Bu MVC ASP.NET uygulamasından artifact çıkarılarak release self hosted Agent deployment grouptan Azure&#39;a register ediliyor ve makine üzerine deploy ediliyor.
+
+# Serverless AI
+
+Daron Yöndem
+
+AI ile ilgili yaygın yaklaşım esasen General AI&#39;ın insansı düşünen bir AI olduğudur ancak akademik dünya&#39;da böyle olduğuna dair bir ortaklaşma bulunmamakta olup, gelişen pratikler bundan uzaktadır.
+
+AI ile ilgili yine yaygın sunumlarda AI biliminin dallarını belirten bir slayt gösterilir. Bunu gösterilen dalların tümüne vakıf olunabileceği hayalini yaratır ancak bu düşünce rasyonel değildir. Belirli bir alan seçip oraya yoğunlaşmak gerekmektedir, aksi durum hiçbir çıktı almaksızın verimsiz enerji harcanmasına neden olabilir.
+
+Serverless AI&#39;da da C ve C++ plus dillerinin günümüzde daha product odaklı C#, Java vb. dillere evrilmesine benzer bir dönüşüm mevcuttur. Şirketlerin AI bilimini uygulayabilecek matemetik bilgisine sahip personel bulundurma olanağı bulunmadığından eskiden kendi insan kaynağını belirli anlaşmalar karşılığı kullandıran büyük yazılım şirketleri, bugün ilk bahsedilen örnekteki gibi, yaygınlaşması ve kullanılabilirliği için kolaylaştırmalar sağlamışlardır. Microsoft&#39;da bu şirketlerden biridir.
+
+Microsoft geçmiş alışkanlıklarının aksine AI alanına girerken aşağıdan yukarı bir yöntemle başlamayı denemiştir. Serverless AI ise basitçe, AI yapılması istenip altyapısı yani serverlarla uğraşmak istenmemesine yönelik olmasıdır. Bunun bazı avantajları ise hiçbir şeyin maintain etmenize scan etmenize gereksinim duyulmaması ile birlikte kullanılan kadar ödeme bütçesi oluşturması olarak sıralanabilir. Bu avantajlarla birlikte serverda AI kullanılması için gerekli component ve toollarla da vakit kaybedilmeyip, serverless AI&#39;larda süreç rest APIler üzerinden ilerlemektedir. Bütün bunlar ise çok hızlı bir şekilde pazara çıkılabilmesini sağlamaktadır.
+
+QnA maker: Web sitenizde bir SSS varsa ve data science ile ilgilenebilecek bir şirket değilseniz, bu uygulamayı kolayca kurup sayfanın linkini girdiğinizde size bir chatbot sağlıyor ve bu chati iframe tagiyle sayfaya yerleştirebiliyorsunuz. Data science ilgili birçok süreç içerisinden uçtan uça bir çözüm sunulmuş oluyor. Customize etmek için Azure Portal&#39;a gittiğinizde chatbot&#39;un C# çıktısını size sunuyor ve burdan flow&#39;ları dilediğiniz özelleştirmeyi yapabiliyorsunuz.
+
+Serverless AI ile kullanılabilecek bazı yardımcı araçlar:
+
+![s4](http://image.prntscr.com/image/PLY2cTUxS1GuU8duYPYATg.png)
+
+### Face recognition
+
+Face detection – resim içindeki yüzleri algılama, yüzdeki burun göz vs konumlarını algılama
+
+Face verification/grouping - unique person üretme ve grup içerisinde tanıma
+
+Similar face searching - kişiye benzer fotoğraf arama
+
+Face identification - kişiye ait fotoğraf arama
+
+### Demo
+
+![s5](http://image.prntscr.com/image/sH4di8lwTouAr95TEhDX7Q.png)
+
+Visual Studio üzerinden basit kodlarla ve Azure üzerinden expose edilen API&#39;ler ile face detection demosu yapılıyor. Kısaca anlatmak gerekirse, FaceLandmark parametresi ile yüzün göz kısmında bir dikdörtgen oluşturuluyor ve o bölge blurlanıyor.
+
+### Computer Vision
+
+Burada bir resim üzerinde bu resimde ne varsa analiz edilebiliyor. Objeler bulunabiliyor, metin varsa tanıyor ve output ediyor, OCR(optical character recognition) yapabiliyor, meşhur insanları tanıyabiliyor. Bir başka özellik, Generate Thumbnail API(smart thumbnail), kullanımına örnek olarak; Twitter&#39;da herhangi bir fotoğraf tweetlerseniz timeline&#39;a geçtiğinizde o fotoğraf croplanıyor. Bu croplamaya dikkat edilirse akıllı bir croplama yapılıyor, point of interest denilen alanı yakalayarak onu ekranda tutabiliyor.
+
+### Demo
+
+![s6](http://image.prntscr.com/image/eqqWOKx1Rre1iCAULsNNjA.png)
+
+Bu örnekte GenerateThumbnailAsync çağrılırak image url veriliyor ve 500\*500 oranında croplama komutu veriliyor. Yine aynı yöntemle bir endpoint ile image urli birleştirilerek uygulama çalıştırılıyor. Normal biçimde croplansa resimde oturan adamın yarısı kırpılacakken sağ tarafta duran insanın point of interest olduğunu yakalıyor ve sol taraftan daha fazla kesiyor.
+
+![s7](http://image.prntscr.com/image/a5OUK3gXRuu0xSs4PqOoNw.png)
+
+### Video Indexer
+
+Video Indexer, videoya oto altyazı sağlayabiliyor, insight verebiliyor videodaki yüzleri yakalayabiliyor, unique konuşan insanları algılayabiliyor. Hangi dakikalarda aynı insanın nasıl bir duyguyla konuştuğunu anlayabiliyor ve translate yapabiliyor. 18 farklı API üzerinde çalışılabiliyor. (Hoca uzun sürebileceği için demo tercih etmiyor)
+
+### Custom Vision
+
+Daha önceki servislerde bir fotoğraftaki basit objeler tanınabiliyordu ama her obje tanınmayabilir. Bu serviste halihazırda tanımlı olmayan modelleri train ederek kendiniz tanıtarak rest API ile kullanabiliyorsunuz. Daha fazla AI ile ilişkili bir uygulama olmasına rağmen aynı basitlikte kullanılabiliniyor.
+
+### Demo
+
+![](RackMultipart20200605-4-17pf8x1_html_73a8a29059473acc.png)
+
+Bu demo, localde bulunan herhangi bir fotoğraf train edilerek evaluate edilip API olarak başka bir uygulama için dışarı çıkabiliyor. Öncelikle Azure Portal üzerinde customvisionservice servisi(ücretsiz) ile quick startla başlanıyor ve customvision.ai adresine bağlanılıyor.
+
+Sign in - New project – isim verme – classification – multiclass (single tag per a image) - Domain:General (compact domain seçilirse export yapılabiliyor) seçenekleri ile proje oluşturuluyor.
+
+Resimler yükleniyor (araba resimi - 30 adet) upload ediliyor.
+
+5 adet otobüs resmi upload ediliyor.
+
+Train butonuna basılarak train işlemi başlatılıyor. İşlem bittikten sonra qucik test ile resim yüklenip test ediliyor ve size yüzde kaç araba veya otobüs olduğunun çıktısını veriyor.
+
+### Speech
+
+Speech to text – text to speech, speech recognition, speech translation gibi hizmetler real time olarak dahi yapılabiliyor.
+
+### Demo
+
+Bu demoda ssmlXMLTemplate ile Türkçe fontu tanıtılıyor, tokenla authtoken olunuyor ve sgml XML Template ile sonunda texttoRead nesnesi ile text okunarak mpg formatına çevriliyor. Uygulama çalıştırıp tarayıcıda endpoint sonuna &quot;?text=Merhaba&quot; yazıldığında bir mp3 dosyası iniyor ve açıldığında merhaba sesi duyuluyor.
+
+### Language
+
+Dil kısmında sentiment analysis çok popüler, text verip onun duygusunu yakalama için kullanılıyor. Translation. Content Moderator, küfür ve pornografiyi tanıyabiliyor ve bir insan oturuyor gibi ekran çıkartarak bu iyi bu kötü diyebiliyor. Bing spell checking, Türkçe &#39;de eksik ama yurtdışı için kullanılabiliyor.
+
+### Demo
+
+Bu demoda kodda bulunan &#39;hava güzel&#39; 0 olumlu, &#39;hava rezalet&#39; 1 olumsuz ve &#39;hava nasıl?&#39; 2 nötr olarak tanınması isteniyor. TextAnalyticsClient oluşturularak sentimentAsync içerisine bu textler yazılıyor ve yine endpoint olarak çalıştırıldığında çıktısında 0, 1 ve 2&#39;nin duygusunu tanıyarak % verek oranlıyor. Bu oranlar ne kadar pozitif olduğunu açıklıyor, negatifi ise daha düşük bir pozitif olma oranıyla açıklıyor.
+
+
